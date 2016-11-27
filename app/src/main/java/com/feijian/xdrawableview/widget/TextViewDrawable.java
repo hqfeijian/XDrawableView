@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.feijian.xdrawableview.R;
@@ -13,12 +14,13 @@ import com.feijian.xdrawableview.R;
  * Created by Administrator on 2016/11/27.
  */
 
-public class TextViewDrawable extends TextView{
+public class TextViewDrawable extends TextView {
 
-    int mTopWidth,mTopHeight,mBottomWidth,mBottomHeight,mLeftWidth,mLeftHeight,mRightWidth,mRightHeight;
-    Drawable mDrawableTop,mDrawableBottom,mDrawableLeft,mDrawableRight;
+    int mTopWidth, mTopHeight, mBottomWidth, mBottomHeight, mLeftWidth, mLeftHeight, mRightWidth, mRightHeight;
+    Drawable mDrawableTop, mDrawableBottom, mDrawableLeft, mDrawableRight;
     Context mContext;
     final int mDefValue = 20;  //默认高宽
+
     public TextViewDrawable(Context context) {
         super(context);
         mContext = context;
@@ -27,6 +29,7 @@ public class TextViewDrawable extends TextView{
     public TextViewDrawable(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        applyDrawable(attrs);
     }
 
     public TextViewDrawable(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -34,13 +37,8 @@ public class TextViewDrawable extends TextView{
         mContext = context;
         applyDrawable(attrs);
     }
-    @TargetApi(21)
-    public TextViewDrawable(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes, int topPadding, int bottomPadding, int leftPadding, int rightPadding) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        mContext = context;
-        applyDrawable(attrs);
-    }
-    private void applyDrawable(AttributeSet attrs){
+
+    private void applyDrawable(AttributeSet attrs) {
         if (attrs != null) {
             float scale = mContext.getResources().getDisplayMetrics().density;
             TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.TextViewDrawable);
@@ -62,9 +60,11 @@ public class TextViewDrawable extends TextView{
                         break;
                     case R.styleable.TextViewDrawable_drawableLeftWidth:
                         mLeftWidth = (int) (a.getDimension(attr, mDefValue) * scale + 0.5f);
+                        Log.e("TextViewDrawable", "mLeftWidth=" + mLeftWidth + ";time=" + System.currentTimeMillis());
                         break;
                     case R.styleable.TextViewDrawable_drawableLeftHeight:
                         mLeftHeight = (int) (a.getDimension(attr, mDefValue) * scale + 0.5f);
+                        Log.e("TextViewDrawable", "mLeftHeight=" + mLeftHeight);
                         break;
                     case R.styleable.TextViewDrawable_drawableRightWidth:
                         mRightWidth = (int) (a.getDimension(attr, mDefValue) * scale + 0.5f);
@@ -95,8 +95,10 @@ public class TextViewDrawable extends TextView{
     }
 
     @Override
-    public void setCompoundDrawables(Drawable left, Drawable top, Drawable right, Drawable bottom) {
+    public void setCompoundDrawablesWithIntrinsicBounds(Drawable left, Drawable top, Drawable right, Drawable bottom) {
         if (left != null) {
+            Log.e("TextViewDrawable", "width=" + (mLeftWidth <= 0 ? left.getIntrinsicWidth() : mLeftWidth) + ";time=" + System.currentTimeMillis());
+            Log.e("TextViewDrawable", "height=" + (mLeftHeight <= 0 ? left.getMinimumHeight() : mLeftHeight));
             left.setBounds(0, 0, mLeftWidth <= 0 ? left.getIntrinsicWidth() : mLeftWidth, mLeftHeight <= 0 ? left.getMinimumHeight() : mLeftHeight);
         }
         if (right != null) {
@@ -109,6 +111,6 @@ public class TextViewDrawable extends TextView{
             bottom.setBounds(0, 0, mBottomWidth <= 0 ? bottom.getIntrinsicWidth() : mBottomWidth, mBottomHeight <= 0 ? bottom.getMinimumHeight()
                     : mBottomHeight);
         }
-        super.setCompoundDrawables(left, top, right, bottom);
+        setCompoundDrawables(left, top, right, bottom);
     }
 }
